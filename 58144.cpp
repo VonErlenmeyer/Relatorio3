@@ -2,27 +2,40 @@
 #include <fstream>
 using namespace std;
 
+void euler(double y[], double x0, double (*function)(double, double, double), 
+           int n, double h, double k, std::fstream &file);
+double radioativeDecay(double k, double x, double y);
+
+
 int main(void){
 
-double h=0.9;
-double y[50]={0};
-double x0 = 0;
-y[0]=1;
-int i;
-double k1, k2, k3, k4;
-fstream Test;
-Test.open("Zeus.dat", ios::out);
+double x0=0;
+double h=0.5;
+int n=50;
+double y[n]={1,0};
 
-for(i=0; i<50; i++){
-    k1 = 5*y[i];
-    k2 = 5*y[i]+k1*h/2;
-    k3 = 5*y[i]+k2*h/2;
-    k4 = 5*y[i]+k3*h;
+fstream Decay;
+Decay.open("Decay.dat", ios::out);
 
-    y[i+1]=y[i]+(h/6)*(k1+1*k2+2*k3+k4);
-    x0 += h;
-    Test << x0 << "\t" << y[i] << endl;
-}
+euler(y, x0, &radioativeDecay, n, h, -2.3, Decay);
+
+
+
 
 return 0;
+}
+
+
+void euler(double y[], double x0, double (*function)(double, double, double), 
+           int n, double h, double k, std::fstream &file){
+
+for(int i=0; i<n; i++){
+    y[i+1]=y[i]+h*(*function)(k, x0, y[i]);
+    x0 += h;
+    file << y[i+1] << endl;
+}
+}
+
+double radioativeDecay(double k, double x, double y){
+    return k*y;
 }
