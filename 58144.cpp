@@ -3,22 +3,19 @@
 #include <cmath>
 using namespace std;
 
-double euler(double y[], double x0, double (*function)(double, double, double), 
-           int n, double h, double k, std::fstream &file);
-double radioativeDecay(double k, double x, double y);
-double rungeKutta(double y[], double x0, double (*function)(double, double, double),
-                  int n, double h, double k, std::fstream &file);
+double euler(double y[], double x0, double (*function)(double, double), 
+             double h, std::fstream &file, bool File);
+double radioativeDecay(double x, double y);
+double rungeKutta(double y[], double x0, double (*function)(double, double),
+                  double h, std::fstream &file, bool File);
 
 int main(void){
 
-int n=50;
-
 double x0=0;
 double h=0.5;
-double y[n]={1,0};
-double k=-2.3;
-double erroEuler[n]={0};
-double erroKutta[n]={0};
+double y[100]={1,0};
+bool File=true;
+
 
 fstream decayEuler1;
 fstream decayEuler2;
@@ -28,13 +25,13 @@ decayEuler2.open("decayEuler2.dat", ios::out);
 decayEuler3.open("decayEuler3.dat", ios::out);
 
 cout << "Exercicio 3.a)" << endl;
-euler(y, x0, &radioativeDecay, n, h, k, decayEuler1);
+euler(y, x0, &radioativeDecay, h, decayEuler1, File);
 
 h=0.7;
-euler(y, x0, &radioativeDecay, n, h, k, decayEuler2);
+euler(y, x0, &radioativeDecay, h, decayEuler2, File);
 
 h=1;
-euler(y, x0, &radioativeDecay, n, h, k, decayEuler3);
+euler(y, x0, &radioativeDecay, h, decayEuler3, File);
 
 cout << "Exercicio 3.b)" << endl;
 
@@ -44,56 +41,53 @@ fstream fErroKutta;
 fErroEuler.open("ErroEuler.dat", ios::out);
 fErroKutta.open("ErroKutta.dat", ios::out);
 
-int i = 0;
-n=5;
+File = false;
 for(double h=1; h>0.0078125; h = h/2){
-    erroEuler[i] = euler(y, x0, &radioativeDecay, n, h, k, decayEuler3);
-    erroKutta[i] = rungeKutta(y, x0, &radioativeDecay, n, h, k, decayEuler3);
-    i++; 
+fErroEuler << h << "\t" << abs(abs(euler(y, x0, &radioativeDecay, h, decayEuler3, File))-exp(-2.3*5)) << endl;
+fErroKutta << h << "\t" << abs(abs(rungeKutta(y, x0, &radioativeDecay, h, decayEuler3, File))-exp(-2.3*5)) << endl;
 }
 
-for(i=0, h=1; i<7; i++){
-    fErroEuler << h << "\t" << abs(erroEuler[i])-exp(-2.3*5) << endl;
-    fErroKutta << h << "\t" << abs(erroKutta[i])-exp(-2.3*5) << endl;
-    h/=2;
-}
+
 
 
 return 0;
 }
 
 
-double euler(double y[], double x0, double (*function)(double, double, double), 
-int n, double h, double k, std::fstream &file){
+double euler(double y[], double x0, double (*function)(double, double), 
+  double h, std::fstream &file, bool File){
 
-for(int i=0; i<n; i++){
-    y[i+1]=y[i]+h*(*function)(k, x0, y[i]);
+int i=0;
+for(; i<=(5/h); i++){
+    y[i+1]=y[i]+h*(*function)(x0, y[i]);
+    if(File == true){
+    file << x0 << "\t" << y[i] << endl;
+    }
     x0 += h;
-    if(k!=5)
-    file << y[i] << endl;
 }
 
-return y[n];
+return y[i-1];
 }
 
-double radioativeDecay(double k, double x, double y){
-    return k*y;
+double radioativeDecay(double x, double y){
+    return -2.3*y;
 }
 
-double rungeKutta(double y[], double x0, double (*function)(double, double, double),
-int n, double h, double k, std::fstream &file){
+double rungeKutta(double y[], double x0, double (*function)(double, double),
+  double h, std::fstream &file, bool File){
 
-for(int i=0; i<n; i++){
-    double k1 = (*function)(k, x0, y[i]);
-    double k2 = (*function)(k, x0+h/2, y[i]+k1*h/2);
-    double k3 = (*function)(k, x0+h/2, y[i]+k2*h/2);
-    double k4 = (*function)(k, x0+h, y[i]+k3*h);
+int i=0;
+for(; i<(5/h); i++){
+    double k1 = (*function)(x0, y[i]);
+    double k2 = (*function)(x0+h/2, y[i]+k1*h/2);
+    double k3 = (*function)(x0+h/2, y[i]+k2*h/2);
+    double k4 = (*function)(x0+h, y[i]+k3*h);
 
     y[i+1]= y[i]+(h/6)*(k1+2*k2+2*k3+k4);
     x0=x0+h;
 
-    if(k!=5)
+    if(File == true)
     file << y[i] << endl;
 }
-return y[n];
+return y[i-1];
 }
