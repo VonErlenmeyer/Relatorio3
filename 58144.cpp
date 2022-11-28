@@ -13,7 +13,7 @@ int main(void){
 
 double x0=0;
 double h=0.5;
-double y[100]={1,0};
+double y[500]={1,0};
 bool File=true;
 
 
@@ -35,6 +35,7 @@ euler(y, x0, &radioativeDecay, h, decayEuler3, File);
 
 cout << "Exercicio 3.b)" << endl;
 
+
 fstream fErroEuler;
 fstream fErroKutta;
 
@@ -43,8 +44,8 @@ fErroKutta.open("ErroKutta.dat", ios::out);
 
 File = false;
 for(double h=1; h>0.0078125; h = h/2){
-fErroEuler << h << "\t" << abs(abs(euler(y, x0, &radioativeDecay, h, decayEuler3, File))-exp(-2.3*5)) << endl;
-fErroKutta << h << "\t" << abs(abs(rungeKutta(y, x0, &radioativeDecay, h, decayEuler3, File))-exp(-2.3*5)) << endl;
+fErroEuler << h << "\t" << fabs(euler(y, x0, &radioativeDecay, h, decayEuler3, File)-exp(-2.3*5)) << endl;
+fErroKutta << h << "\t" << fabs(rungeKutta(y, x0, &radioativeDecay, h, decayEuler3, File)-exp(-2.3*5)) << endl;
 }
 
 
@@ -66,7 +67,7 @@ for(; i<=(5/h); i++){
     x0 += h;
 }
 
-return y[i-1];
+return y[i];
 }
 
 double radioativeDecay(double x, double y){
@@ -89,5 +90,8 @@ for(; i<(5/h); i++){
     if(File == true)
     file << y[i] << endl;
 }
-return y[i-1];
+
+cout << i << endl;
+
+return y[i];
 }
