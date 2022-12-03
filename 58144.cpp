@@ -1,97 +1,126 @@
 #include <iostream>
-#include <fstream>
 #include <cmath>
+#include <fstream>
 using namespace std;
 
-double euler(double y[], double x0, double (*function)(double, double), 
-             double h, std::fstream &file, bool File);
-double radioativeDecay(double x, double y);
-double rungeKutta(double y[], double x0, double (*function)(double, double),
-                  double h, std::fstream &file, bool File);
+double metodoEuler(fstream &file, double x[], double y[], double h, double t0, int exercicio, bool File);
+double metodoKutta(fstream &file, double x[], double y[], double h, double t0, int exercicio);
+
 
 int main(void){
 
-double x0=0;
-double h=0.5;
-double y[500]={1,0};
-bool File=true;
-
+double x[500]={0};
+double y[500]={0};
+double h = 0.5;
+double tInicial = 0;
 
 fstream decayEuler1;
 fstream decayEuler2;
 fstream decayEuler3;
-decayEuler1.open("decayEuler1.dat", ios::out);
-decayEuler2.open("decayEuler2.dat", ios::out);
-decayEuler3.open("decayEuler3.dat", ios::out);
+fstream trajetoriaEuler;
+fstream trajetoriaKutta;
+fstream erroEuler;
+fstream erroKutta;
 
-cout << "Exercicio 3.a)" << endl;
-euler(y, x0, &radioativeDecay, h, decayEuler1, File);
+cout << "Exercicio 3. a)" << endl;
 
-h=0.7;
-euler(y, x0, &radioativeDecay, h, decayEuler2, File);
+decayEuler1.open("DecayEuler1.dat", ios::out);
+decayEuler2.open("DecayEuler2.dat", ios::out);
+decayEuler3.open("DecayEuler3.dat", ios::out);
 
-h=1;
-euler(y, x0, &radioativeDecay, h, decayEuler3, File);
+y[0] = 1;
+metodoEuler(decayEuler1, x, y, 0.5, tInicial, 3, true);
+metodoEuler(decayEuler2, x, y, 0.7, tInicial, 3, true);
+metodoEuler(decayEuler3, x, y, 1, tInicial, 3, true);
 
-cout << "Exercicio 3.b)" << endl;
+cout << "Exercicio 3. b)" << endl;
+
+erroEuler.open("ErroEuler.dat", ios::out);
+erroKutta.open("ErroKutta.dat", ios::out);
+
+for(double h=1; h>0.0078125; h/=2){
+erroEuler << h << "\t" << fabs(metodoEuler(decayEuler3, x, y, h, tInicial, 3, false)-exp(-2.3*5)) << endl;
+erroKutta << h << "\t" << fabs(metodoKutta(decayEuler3, x, y, h, tInicial, 3)-exp(-2.3*5)) << endl;
+}
+
+cout << "Exercicio 4" << endl;
+
+y[0] = 0;
+trajetoriaEuler.open("EulerTrajetoria.dat", ios::out);
+trajetoriaKutta.open("KuttaTrajetoria.dat", ios::out);
+
+metodoEuler(trajetoriaEuler, x, y, h, tInicial, 4, true);
+metodoKutta(trajetoriaKutta, x, y, h, tInicial, 4);
 
 
-fstream fErroEuler;
-fstream fErroKutta;
-
-fErroEuler.open("ErroEuler.dat", ios::out);
-fErroKutta.open("ErroKutta.dat", ios::out);
-
-File = false;
-for(double h=1; h>0.0078125; h = h/2){
-fErroEuler << h << "\t" << fabs(euler(y, x0, &radioativeDecay, h, decayEuler3, File)-exp(-2.3*5)) << endl;
-fErroKutta << h << "\t" << fabs(rungeKutta(y, x0, &radioativeDecay, h, decayEuler3, File)-exp(-2.3*5)) << endl;
 }
 
 
-
-
-return 0;
-}
-
-
-double euler(double y[], double x0, double (*function)(double, double), 
-  double h, std::fstream &file, bool File){
+double metodoEuler(fstream &file, double x[], double y[], double h, double t0, int exercicio, bool File){
 
 int i=0;
-for(; i<=(5/h); i++){
-    y[i+1]=y[i]+h*(*function)(x0, y[i]);
+
+if(exercicio == 3){
+    for(i=0; i<=(5/h); i++){
+    y[i+1]=y[i]+(-2.3*y[i]*h);
     if(File == true){
-    file << x0 << "\t" << y[i] << endl;
+        file << t0 << "\t" << y[i] << endl;
+        }
+    t0 += h;
     }
-    x0 += h;
+}
+else if (exercicio == 4){
+    for(i=0; i<10; i++){
+    y[i+1]=y[i]+(-9.81*t0+sqrt(200))*h;
+    x[i+1]=x[i]+sqrt(200)*h;
+    file << x[i] << "\t" << y[i] << endl;
+    t0 += h;
+    }
 }
 
 return y[i];
 }
 
-double radioativeDecay(double x, double y){
-    return -2.3*y;
-}
-
-double rungeKutta(double y[], double x0, double (*function)(double, double),
-  double h, std::fstream &file, bool File){
+double metodoKutta(fstream &file, double x[], double y[], double h, double t0, int exercicio){
 
 int i=0;
-for(; i<(5/h); i++){
-    double k1 = (*function)(x0, y[i]);
-    double k2 = (*function)(x0+h/2, y[i]+k1*h/2);
-    double k3 = (*function)(x0+h/2, y[i]+k2*h/2);
-    double k4 = (*function)(x0+h, y[i]+k3*h);
+double yk1, yk2, yk3, yk4;
+double xk1, xk2, xk3, xk4;
 
-    y[i+1]= y[i]+(h/6)*(k1+2*k2+2*k3+k4);
-    x0=x0+h;
+if(exercicio == 3){
+    for(i=0; i<(5/h); i++){
+    yk1 = (-2.3*(y[i]));
+    yk2 = (-2.3*(y[i]+yk1*h/2));
+    yk3 = (-2.3*(y[i]+yk2*h/2));
+    yk4 = (-2.3*(y[i]+yk3*h));
 
-    if(File == true)
-    file << y[i] << endl;
+    y[i+1] = y[i] + (h/6)*(yk1+2*yk2+2*yk3+yk4);
+
+    }
 }
 
-cout << i << endl;
+else if (exercicio == 4){
+    for(i=0;i<10; i++){
+    yk1 = (-9.81*t0+sqrt(200));
+    yk2 = (-9.81*(t0+h/2)+sqrt(200));
+    yk3 = (-9.81*(t0+h/2)+sqrt(200));
+    yk4 = (-9.81*(t0+h)+sqrt(200));
+
+    xk1 = (sqrt(200));
+    xk2 = (sqrt(200));
+    xk3 = (sqrt(200));
+    xk4 = (sqrt(200));
+
+    x[i+1] = x[i] + (h/6)*(xk1+2*xk2+2*xk3+xk4);
+    y[i+1] = y[i] + (h/6)*(yk1+2*yk2+2*yk3+yk4); 
+
+    file << x[i] << "\t" << y[i] << endl;
+
+    t0 += h;
+    }
+}
 
 return y[i];
 }
+
+

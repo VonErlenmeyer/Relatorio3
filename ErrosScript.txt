@@ -1,8 +1,8 @@
-plot 'ErroEuler.dat' with lp linetype 7 linecolor "blue" linewidth 2 title "Metodo de Euler", 'ErroKutta.dat' with lp linetype 7 linecolor "red" linewidth 2 title "Metodo de Runge-Kutta"
+plot 'ErroEuler.dat' with lp linetype 7 linecolor "blue" linewidth 2 title "Método de Euler", 'ErroKutta.dat' with lp linetype 7 linecolor "red" linewidth 2 title "Método de Runge-Kutta"
 set key bottom right 
-set ylabel "Desvio ao Valor Analitico" font "Sans,14"
+set ylabel "Desvio ao Valor Analítico" font "Sans,14" offset 1,0
 set xlabel "Tamanho do Passo" font "Sans,14"
-set title "Erro na Convergencia de cada Metodo" font "Sans,16"
+set title "Erro na Convergência de cada Método" font "Sans,16"
 set logscale
 set terminal qt size 800,600
 replot
