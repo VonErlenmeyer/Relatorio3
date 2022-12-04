@@ -1,13 +1,14 @@
 set terminal qt size 800,600
+set tics font ",12"
 set multiplot
 set xrange [0:50]
 set yrange [0:15]
 plot 'EulerTrajetoria.dat' title 'Trajetória por Euler' with lp linecolor "blue" linewidth 2, 'KuttaTrajetoria.dat' title 'Trajetória por Runge-Kutta' with lp linecolor "red" linewidth 2
 set parametric
-set key offset 0,-2
-set title 'Lançamento de um Projétil' font "Sans,16"
-set xlabel 'Posição horizontal, x (m)' font "Sans,14"
-set ylabel 'Posição vertical, y (m)' font "Sans,14"
+set key offset 0,-3 font ",12"
+set title 'Lançamento de um Projétil' font "Sans,18"
+set xlabel 'Posição horizontal, x (m)' font "Sans,16"
+set ylabel 'Posição vertical, y (m)' font "Sans,16"
 plot 14.14213*t, 14.14213*t-0.5*9.81*t**2 title 'Trajetória Real' with line linecolor "purple" linewidth 3
 unset multiplot
 unset logscale

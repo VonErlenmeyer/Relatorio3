@@ -190,8 +190,10 @@ if(exercicio == 3){
     }
 }
 else if (exercicio == 4){
+double vy[300]={0};
     for(i=0; i<10; i++){
-    y[i+1]=y[i]+(-9.81*t0+sqrt(200))*h;
+    vy[i+1]=vy[i]+(-9.81)*h;
+    y[i+1]=y[i]+(vy[i]+sqrt(200))*h;
     x[i+1]=x[i]+sqrt(200)*h;
     cout << x[i] << "\t" << y[i] << endl;
     file << x[i] << "\t" << y[i] << endl;
@@ -205,6 +207,7 @@ return y[i];
 double metodoKutta(fstream &file, double x[], double y[], double h, double t0, int exercicio){
 
 int i=0;
+double vyk1, vyk2, vyk3, vyk4;
 double yk1, yk2, yk3, yk4;
 double xk1, xk2, xk3, xk4;
 
@@ -221,11 +224,20 @@ if(exercicio == 3){
 }
 
 else if (exercicio == 4){
+double vy[300]={0};
     for(i=0;i<10; i++){
-    yk1 = (-9.81*t0+sqrt(200));
-    yk2 = (-9.81*(t0+h/2)+sqrt(200));
-    yk3 = (-9.81*(t0+h/2)+sqrt(200));
-    yk4 = (-9.81*(t0+h)+sqrt(200));
+    
+    vyk1 = -9.81;
+    vyk2 = -9.81;
+    vyk3 = -9.81;
+    vyk4 = -9.81;
+
+    vy[i+1]=vy[i]+(h/6)*(vyk1*2+vyk2*2+vyk3+vyk4);
+
+    yk1 = (vy[i]+sqrt(200));
+    yk2 = (vy[i]+(-9.81*h/2)+sqrt(200));
+    yk3 = (vy[i]+(-9.81*h/2)+sqrt(200));
+    yk4 = (vy[i]+(h*(-9.81))+sqrt(200));
 
     xk1 = (sqrt(200));
     xk2 = (sqrt(200));

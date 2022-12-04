@@ -1,6 +1,8 @@
 plot exp(-2.3*x) linewidth 3 title 'Exponencial', 'decayEuler1.dat' with lp linewidth 2 linecolor 'blue' linetype 7 title 'h = 0.5', 'decayEuler2.dat' with lp linewidth 2 linecolor 'red' linetype 7 title 'h = 0.7', 'decayEuler3.dat' with lp linewidth 2 linecolor 'yellow' linetype 7 title 'h = 1'
-set xlabel 't em horas' font 'Sans,14'
-set ylabel 'N(t)' font 'Sans,14'
-set title 'Decaimento Radioativo, N(t), por hora' font 'Sans,16'
+set xlabel 't em horas' font 'Sans,16'
+set ylabel 'N(t)' font 'Sans,16'
+set title 'Decaimento Radioativo, N(t), por hora' font 'Sans,18'
 set terminal qt size 800,600
+set key bottom left font ',12'
+set tics font ",12"
 replot
